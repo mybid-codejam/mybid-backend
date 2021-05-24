@@ -1,7 +1,9 @@
-import Controller from '../core/controller';
+const Controller = require('../core/controller');
 
-export default class HomeController extends Controller {
+class HomeController extends Controller {
   getHome() {
     return this.res.send('Hello World');
   }
 }
+
+module.exports = HomeController;

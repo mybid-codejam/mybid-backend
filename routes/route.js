@@ -1,14 +1,15 @@
-import { Router as expressRouter } from 'express';
-import HomeController from '../controllers/home.controller';
+const { Router } = require('express');
+const { HomeController, UserController } = require('../controllers');
 
-export default class Route {
+class Route {
   constructor() {
-    this.router = expressRouter();
+    this.router = Router();
   }
 
   init() {
     return [
       this.get('/', (req, res) => new HomeController(req, res).getHome()),
+      this.get('/user', (req, res) => new UserController(req, res).createUser()),
     ];
   }
 
@@ -16,3 +17,5 @@ export default class Route {
     return this.router.get(path, handlers);
   }
 }
+
+module.exports = Route;
