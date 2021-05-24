@@ -13,8 +13,8 @@ User.init({
   lastName: { allowNull: false, type: DataTypes.STRING },
   address: { allowNull: false, type: DataTypes.TEXT },
   type: { allowNull: false, type: DataTypes.TINYINT },
-  apiToken: { allowNull: false, type: DataTypes.STRING },
-  lastLogin: { allowNull: false, type: DataTypes.DATE },
+  apiToken: { allowNull: true, type: DataTypes.STRING },
+  lastLogin: { allowNull: true, type: DataTypes.DATE },
 }, {
   sequelize,
   tableName: 'users',
