@@ -2,18 +2,24 @@
   "name": "mybid-backend",
   "version": "1.0.0",
   "description": "MyBid Backend",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
+    "start": "node --es-module-specifier-resolution=node index.js",
+    "start:dev": "nodemon --es-module-specifier-resolution=node index.js",
     "migrate": "npx sequelize-cli db:migrate",
     "migrate:clean": "npx sequelize-cli db:migrate:undo:all"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.17.1",
     "mysql2": "^2.2.5",
     "sequelize": "^6.6.2"
   },
   "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.3",
     "sequelize-cli": "^6.2.0"
   }
 }
