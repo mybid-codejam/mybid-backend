@@ -1,46 +1,64 @@
+const md5 = require('md5');
 const { UniqueConstraintError } = require('sequelize');
 const { User } = require('../models');
 const Controller = require('../core/controller');
+const ResponseError = require('../exceptions/response.error');
 
 class UserController extends Controller {
-  get() {
-    return this.sendResponse({ message: 'success save  data' });
-  }
-
-  async create() {
-    const validate = this.validate(['email', 'password', 'firstName', 'lastName', 'address', 'type']);
+  async register() {
+    const validate = this.validate(['email', 'password', 'firstName', 'lastName', 'address']);
 
     if (validate) {
-      const {
-        email, password, firstName, lastName, address, type,
-      } = validate;
-
       try {
+        const {
+          email, password, firstName, lastName, address,
+        } = validate;
+
         const user = await User.create({
-          email, password, firstName, lastName, address, type,
+          email, password: md5(password), firstName, lastName, address,
         });
+
         return this.sendResponse({
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           address: user.address,
-          type: user.type,
-          typeDescription: (user.type === 1) ? 'Penjual' : 'Pembeli',
           createdAt: user.createdAt,
         }, 'Success register', 201);
       } catch (e) {
-        if (e instanceof UniqueConstraintError) {
-          return this.sendResponse(null, 'Email already used', 400);
-        }
-        return this.sendResponse(null, 'Failed', 400);
+        throw new ResponseError('Email already used', 400);
       }
     }
 
     return null;
   }
 
+  async login() {
+    const validate = this.validate(['email', 'password']);
+    if (validate) {
+      const { email, password } = validate;
+      const user = await User.findOne({ where: { email, password: md5(password) } });
+
+      if (user === null) {
+        throw new ResponseError('User not found or wrong email/password', 404);
+      }
+
+      // update api token and last login
+      const apiToken = md5(Date.now());
+      const lastLogin = new Date().toISOString();
+      user.apiToken = apiToken;
+      user.lastLogin = lastLogin;
+      user.save();
+
+      return this.sendResponse({
+        email, apiToken, lastLogin,
+      }, 'Success login');
+    }
+    return null;
+  }
+
   async update() {
-    const { email } = this.req.params;
+    const { email } = this.res.locals.user;
     const validate = this.validate(['firstName', 'lastName', 'address']);
 
     if (validate) {

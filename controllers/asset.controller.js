@@ -1,6 +1,9 @@
 const { UniqueConstraintError } = require('sequelize');
-const { asset } = require('../models');
+const firebase = require('firebase-admin');
+const fs = require('fs/promises');
+const { Asset } = require('../models');
 const Controller = require('../core/controller');
+const ResponseError = require('../exceptions/response.error');
 
 class AssetController extends Controller {
   get() {
@@ -8,34 +11,54 @@ class AssetController extends Controller {
   }
 
   async create() {
-    const validate = this.validate(['id', 'email', 'name', 'categoryId', 'image', 'basePrice', 'isSold', 'endedAt', 'createdAt', 'updatedAt']);
+    const { email } = this.res.locals.user;
+    const validate = this.validate(['name', 'categoryId', 'basePrice', 'endedAt']);
     if (validate) {
+      const { files } = this.req;
+      // validate file is image
+      for (let i = 0; i < files.length; i++) {
+        const { mimetype } = files[i];
+        const type = mimetype.split('/')[0];
+        if (type !== 'image') {
+          throw new ResponseError('Only image', 400);
+        }
+      }
+      const storage = firebase.storage();
+      const bucket = storage.bucket();
+      const images = [];
+      for (let i = 0; i < files.length; i++) {
+        const { path, filename } = files[i];
+        const imageUrl = `https://storage.googleapis.com/mybid-e8958.appspot.com/${filename}`;
+        // eslint-disable-next-line no-await-in-loop
+        await bucket.upload(path, { // upload file
+          resumable: true,
+          predefinedAcl: 'publicRead',
+        });
+        images.push(imageUrl);
+
+        // eslint-disable-next-line no-await-in-loop
+        await fs.unlink(path); // delete temp file
+      }
+
       const {
-        id, email, name, categoryId, image, basePrice, isSold, endedAt, createdAt, updatedAt
+        name, categoryId, basePrice, endedAt,
       } = validate;
 
-      try {
-        const user = await asset.create({
-          id, email, name, categoryId, image, basePrice, isSold, endedAt, createdAt, updatedAt
-        });
-        return this.sendResponse({
-          id: asset.id,
-          email: asset.email, 
-          name: asset.email,
-          categoryId: asset.categoryId,
-          image: asset.image,
-          basePrice: asset.basePrice,
-          isSold: asset.isSold,
-          endedAt: asset.endedAt,
-          createdAt: asset.createAt,
-          updatedAt: asset.updatedAt
-        }, 'Success register', 201);
-      } catch (e) {
-        if (e instanceof UniqueConstraintError) {
-          return this.sendResponse(null, 'Email already used', 400);
-        }
-        return this.sendResponse(null, 'Failed', 400);
-      }
+      const asset = await Asset.create({
+        email, name, categoryId, image: JSON.stringify(images), basePrice, endedAt,
+      });
+
+      return this.sendResponse({
+        email,
+        name: asset.name,
+        categoryId: asset.categoryId,
+        image: images,
+        basePrice: asset.basePrice,
+        isSold: asset.isSold,
+        endedAt: asset.endedAt,
+        createdAt: asset.createdAt,
+        updatedAt: asset.updatedAt,
+      }, 'Success register', 201);
     }
 
     return null;
@@ -43,31 +66,29 @@ class AssetController extends Controller {
 
   async update() {
     const { id } = this.req.params;
-    const validate = this.validate(['id', 'email', 'name', 'categoryId', 'image', 'basePrice', 'isSold', 'endedAt', 'createdAt', 'updatedAt']);
+    const validate = this.validate(['email', 'name', 'categoryId', 'image', 'basePrice', 'isSold', 'endedAt']);
 
     if (validate) {
       const {
-        id, email, name, categoryId, image, basePrice, isSold, endedAt, createdAt, updatedAt
+        email, name, categoryId, image, basePrice, isSold, endedAt,
       } = validate;
 
       try {
-        await asset.update({
-          id, email, name, categoryId, image, basePrice, isSold, endedAt, createdAt, updatedAt
+        await Asset.update({
+          email, name, categoryId, image, basePrice, isSold, endedAt,
         }, {
-          where: { email },
+          where: { id },
         });
 
         return this.sendResponse({
-          id, 
-          email, 
-          name, 
-          categoryId, 
-          image, 
-          basePrice, 
-          isSold, 
+          id,
+          email,
+          name,
+          categoryId,
+          image,
+          basePrice,
+          isSold,
           endedAt,
-          createdAt,
-          updatedAt
         }, 'Success update');
       } catch (e) {
         if (e instanceof UniqueConstraintError) {
@@ -79,31 +100,32 @@ class AssetController extends Controller {
 
     return null;
   }
-  async delete(){
-  const { id } = req.params;
-  try {
-    const data = await asset.findOne({
-      where : {
-        id: id
+
+  async delete() {
+    const { id } = this.req.params;
+
+    try {
+      const data = await Asset.findOne({
+        where: { id },
+      });
+
+      if (!data) {
+        return null;
       }
-    })
-    if(!data){
-      return null
+
+      await Asset.destroy({
+        where: { id },
+      });
+
+      return this.sendResponse({
+        status: 'ok',
+        server_message: 'record deleted',
+      });
+    } catch (err) {
+      console.log(err);
+      return null;
     }
-    await asset.destroy({
-      where : {
-        id: id
-      }
-    })
-    return this.sendResponse({
-      status : 'ok',
-      server_message : 'record deleted'
-    })
-  } catch (err) {
-    console.log(err)
-    return null
   }
-}
 }
 
 module.exports = AssetController;

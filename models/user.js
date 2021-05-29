@@ -12,7 +12,6 @@ User.init({
   firstName: { allowNull: false, type: DataTypes.STRING },
   lastName: { allowNull: false, type: DataTypes.STRING },
   address: { allowNull: false, type: DataTypes.TEXT },
-  type: { allowNull: false, type: DataTypes.TINYINT },
   apiToken: { allowNull: true, type: DataTypes.STRING },
   lastLogin: { allowNull: true, type: DataTypes.DATE },
 }, {

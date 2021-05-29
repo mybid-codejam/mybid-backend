@@ -1,10 +1,19 @@
 require('dotenv').config(); // register .env
 const express = require('express');
 const bodyParser = require('body-parser');
+const firebase = require('firebase-admin');
 const Route = require('./routes/route');
+const serviceAccount = require('./mybid-e8958-firebase-adminsdk-tke8g-b70beafbeb.json');
 
 const port = 3000;
 const app = express();
+
+// *init firebase
+const firebaseConfig = {
+  credential: firebase.credential.cert(serviceAccount),
+  storageBucket: 'mybid-e8958.appspot.com',
+};
+firebase.initializeApp(firebaseConfig);
 
 // *init module
 // parse application/x-www-form-urlencoded
@@ -13,17 +22,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // *init route
 app.use('/api', new Route().init());
 
-// *handle not found
-// eslint-disable-next-line arrow-body-style
-app.use('*', (req, res) => {
-  return res.status(400).json({
-    success: false,
-    message: 'Endpoint not found',
-    data: null,
-  });
-});
-
 app.listen(port, () => {
   console.log(`Listen on ${port}`);
 });
-

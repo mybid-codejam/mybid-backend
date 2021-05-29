@@ -1,98 +1,76 @@
-const { UniqueConstraintError } = require('sequelize');
-const { category } = require('../models');
+const { Category } = require('../models');
 const Controller = require('../core/controller');
+const ResponseError = require('../exceptions/response.error');
 
 class CategoryController extends Controller {
-  get() {
-    return this.sendResponse({ message: 'success save  data' });
+  async getAll() {
+    const categories = await Category.findAll();
+    const data = [];
+    for (let i = 0; i < categories.length; i++) {
+      data.push({
+        id: categories[i].id,
+        name: categories[i].name,
+        createdAt: categories[i].createdAt,
+        updatedAt: categories[i].updatedAt,
+      });
+    }
+
+    return this.sendResponse(data);
   }
 
   async create() {
-    const validate = this.validate(['id', 'name', 'createdAt', 'updateAt']);
+    const validate = this.validate(['name']);
 
     if (validate) {
-      const {
-        id, name, createdAt, updateAt
-      } = validate;
+      const { name } = validate;
 
-      try {
-        const user = await category.create({
-          id, name, createdAt, updateAt
-        });
-        return this.sendResponse({
-          id: category.id,
-          name: category.name,
-          createdAt: category.createdAt,
-          updateAt: category.updateAt
-        }, 'Success register', 201);
-      } catch (e) {
-        if (e instanceof UniqueConstraintError) {
-          return this.sendResponse(null, 'Email already used', 400);
-        }
-        return this.sendResponse(null, 'Failed', 400);
-      }
+      const category = await Category.create({ name });
+
+      return this.sendResponse({
+        id: category.id,
+        name: category.name,
+        createdAt: category.createdAt,
+        updatedAt: category.updatedAt,
+      }, 'Success create category', 201);
     }
 
     return null;
   }
 
   async update() {
-    const { assetId } = this.req.params;
-    const validate = this.validate(['id', 'name', 'createdAt', 'updateAt']);
+    const { id } = this.req.params;
+    const validate = this.validate(['name']);
 
     if (validate) {
-      const {
-        id, name, createdAt, updateAt
-      } = validate;
+      const { name } = validate;
 
-      try {
-        await category.update({
-          id, name, createdAt, updateAt
-        }, {
-          where: { id },
-        });
+      const category = await Category.findOne({ where: { id } });
+      category.name = name;
+      category.save();
 
-        return this.sendResponse({
-          id,
-          name,
-          createdAt,
-          updateAt
-        }, 'Success update');
-      } catch (e) {
-        if (e instanceof UniqueConstraintError) {
-          return this.sendResponse(null, 'Email already used', 400);
-        }
-        return this.sendResponse(null, 'Failed', 400);
-      }
+      return this.sendResponse({
+        id: category.id,
+        name: category.name,
+        cratedAt: category.createdAt,
+        updatedAt: category.updatedAt,
+      }, 'Success update');
     }
 
     return null;
   }
-  async delete(){
-  const { id } = req.params;
-  try {
-    const data = await category.findOne({
-      where : {
-        id: id
-      }
-    })
-    if(!data){
-      return null
+
+  async delete() {
+    const { id } = this.req.params;
+    const category = await Category.findOne({ where: { id } });
+
+    if (category === null) {
+      throw new ResponseError('Category not found', 404);
+    } else {
+      await category.destroy();
+
+      return this.sendResponse(null, 'Success delete category');
     }
-    await category.destroy({
-      where : {
-        id: id
-      }
-    })
-    return this.sendResponse({
-      status : 'ok',
-      server_message : 'record deleted'
-    })
-  } catch (err) {
-    console.log(err)
-    return null
   }
-}
 }
 
 module.exports = CategoryController;
