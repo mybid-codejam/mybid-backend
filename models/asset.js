@@ -24,7 +24,7 @@ Asset.init({
       key: 'id',
     },
   },
-  image: { allowNull: false, type: DataTypes.STRING },
+  images: { allowNull: false, type: DataTypes.TEXT },
   basePrice: { allowNull: false, type: DataTypes.INTEGER },
   isSold: { allowNull: false, type: DataTypes.BOOLEAN, defaultValue: false },
   endedAt: { allowNull: false, type: DataTypes.DATE },

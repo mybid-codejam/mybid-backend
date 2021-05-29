@@ -45,14 +45,14 @@ class AssetController extends Controller {
       } = validate;
 
       const asset = await Asset.create({
-        email, name, categoryId, image: JSON.stringify(images), basePrice, endedAt,
+        email, name, categoryId, images: JSON.stringify(images), basePrice, endedAt,
       });
 
       return this.sendResponse({
         email,
         name: asset.name,
         categoryId: asset.categoryId,
-        image: images,
+        images,
         basePrice: asset.basePrice,
         isSold: asset.isSold,
         endedAt: asset.endedAt,
