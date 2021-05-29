@@ -9,8 +9,8 @@ const Transaction = require('./transaction');
 (async () => {
   await User.sync({ logging: false });
   await Category.sync({ logging: false });
-  await Cart.sync({ logging: false });
   await Asset.sync({ logging: false });
+  await Cart.sync({ logging: false });
   await Transaction.sync({ logging: false });
   await Payment.sync({ logging: false });
 })();
