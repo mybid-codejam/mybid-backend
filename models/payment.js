@@ -16,7 +16,7 @@ Payment.init({
     },
   },
   type: { allowNull: false, type: DataTypes.STRING },
-  status: { allowNull: false, type: DataTypes.TINYINT },
+  status: { allowNull: false, type: DataTypes.INTEGER },
 }, {
   sequelize,
   tableName: 'payments',

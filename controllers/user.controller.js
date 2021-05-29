@@ -26,7 +26,9 @@ class UserController extends Controller {
           createdAt: user.createdAt,
         }, 'Success register', 201);
       } catch (e) {
-        throw new ResponseError('Email already used', 400);
+        if (e instanceof UniqueConstraintError) {
+          throw new ResponseError('Email already used', 400);
+        }
       }
     }
 
