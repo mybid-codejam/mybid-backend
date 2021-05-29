@@ -5,7 +5,7 @@ const firebase = require('firebase-admin');
 const Route = require('./routes/route');
 const serviceAccount = require('./mybid-e8958-firebase-adminsdk-tke8g-b70beafbeb.json');
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 const app = express();
 
 // *init firebase
