@@ -57,7 +57,6 @@ class Route {
       this.patch('/transaction', (req, res) => new TransactionController(req, res).update()),
 
       // *handle error
-      // eslint-disable-next-line no-unused-vars
       this.router.use((err, req, res, next) => {
         if (err instanceof ResponseError) {
           return res.status(err.statusCode).json({
@@ -75,14 +74,11 @@ class Route {
       }),
 
       // *handle not found
-      // eslint-disable-next-line arrow-body-style
-      this.router.use('*', (req, res) => {
-        return res.status(400).json({
-          success: false,
-          message: 'Endpoint not found',
-          data: null,
-        });
-      }),
+      this.router.use('*', (req, res) => res.status(400).json({
+        success: false,
+        message: 'Endpoint not found',
+        data: null,
+      })),
     ];
   }
 

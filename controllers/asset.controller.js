@@ -29,14 +29,12 @@ class AssetController extends Controller {
       for (let i = 0; i < files.length; i++) {
         const { path, filename } = files[i];
         const imageUrl = `https://storage.googleapis.com/mybid-e8958.appspot.com/${filename}`;
-        // eslint-disable-next-line no-await-in-loop
         await bucket.upload(path, { // upload file
           resumable: true,
           predefinedAcl: 'publicRead',
         });
         images.push(imageUrl);
 
-        // eslint-disable-next-line no-await-in-loop
         await fs.unlink(path); // delete temp file
       }
 
