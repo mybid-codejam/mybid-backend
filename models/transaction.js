@@ -23,7 +23,7 @@ Transaction.init({
       key: 'email',
     },
   },
-  bidPrice: { allowNull: false, type: DataTypes.INTEGER },
+  bidPrice: { allowNull: false, type: DataTypes.INTEGER, defaultValue: 0 },
 }, {
   sequelize,
   tableName: 'transactions',

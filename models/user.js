@@ -9,9 +9,9 @@ class User extends Model { }
 User.init({
   email: { primaryKey: true, type: DataTypes.STRING },
   password: { allowNull: false, type: DataTypes.STRING },
-  firstName: { allowNull: false, type: DataTypes.STRING },
-  lastName: { allowNull: false, type: DataTypes.STRING },
-  address: { allowNull: false, type: DataTypes.TEXT },
+  firstName: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
+  lastName: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
+  address: { allowNull: false, type: DataTypes.TEXT, defaultValue: '' },
   apiToken: { allowNull: true, type: DataTypes.STRING },
   lastLogin: { allowNull: true, type: DataTypes.DATE },
 }, {

@@ -7,7 +7,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 
 class Category extends Model { }
 Category.init({
-  name: { allowNull: false, type: DataTypes.STRING },
+  name: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
 }, {
   sequelize,
   tableName: 'categories',

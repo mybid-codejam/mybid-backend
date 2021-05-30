@@ -12,7 +12,7 @@ class AssetController extends Controller {
 
   async create() {
     const { email } = this.res.locals.user;
-    const validate = this.validate(['name', 'categoryId', 'basePrice', 'endedAt']);
+    const validate = this.validate(['name', 'categoryId', 'description', 'document', 'basePrice', 'endedAt']);
     if (validate) {
       const { files } = this.req;
       // validate file is image
@@ -41,11 +41,11 @@ class AssetController extends Controller {
       }
 
       const {
-        name, categoryId, basePrice, endedAt,
+        name, categoryId, basePrice, endedAt, description, document,
       } = validate;
 
       const asset = await Asset.create({
-        email, name, categoryId, images: JSON.stringify(images), basePrice, endedAt,
+        email, name, categoryId, images: JSON.stringify(images), basePrice, endedAt, description, document,
       });
 
       return this.sendResponse({
@@ -54,6 +54,8 @@ class AssetController extends Controller {
         categoryId: asset.categoryId,
         images,
         basePrice: asset.basePrice,
+        description: asset.description,
+        document: asset.document,
         isSold: asset.isSold,
         endedAt: asset.endedAt,
         createdAt: asset.createdAt,
