@@ -35,9 +35,10 @@ class Route {
       this.post('/login', (req, res) => new UserController(req, res).login()),
       this.patch('/profile', (req, res) => new UserController(req, res).update(), [Middleware.auth]),
 
+      // TODO beri middleware auth pada endpoint cart, untuk mengizinkan hanya user yang login bisa mengakses
       this.get('/cart', (req, res) => new CartController(req, res).get()),
       this.post('/cart', (req, res) => new CartController(req, res).create()),
-      this.patch('/cart', (req, res) => new CartController(req, res).update()),
+      this.delete('/cart', (req, res) => new CartController(req, res).delete()),
 
       this.get('/category', (req, res) => new CategoryController(req, res).getAll()),
       this.post('/category', (req, res) => new CategoryController(req, res).create(), [Middleware.auth]),
