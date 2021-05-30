@@ -40,13 +40,15 @@ class Route {
       this.patch('/cart', (req, res) => new CartController(req, res).update()),
 
       this.get('/category', (req, res) => new CategoryController(req, res).getAll()),
-      this.post('/category', (req, res) => new CategoryController(req, res).create()),
-      this.patch('/category/:id', (req, res) => new CategoryController(req, res).update()),
-      this.delete('/category/:id', (req, res) => new CategoryController(req, res).delete()),
+      this.post('/category', (req, res) => new CategoryController(req, res).create(), [Middleware.auth]),
+      this.patch('/category/:id', (req, res) => new CategoryController(req, res).update(), [Middleware.auth]),
+      this.delete('/category/:id', (req, res) => new CategoryController(req, res).delete(), [Middleware.auth]),
 
-      this.get('/asset', (req, res) => new AssetController(req, res).get()),
+      this.get('/asset', (req, res) => new AssetController(req, res).getAll()),
+      this.get('/asset/:id', (req, res) => new AssetController(req, res).get()),
       this.post('/asset', (req, res) => new AssetController(req, res).create(), [Middleware.auth, this.upload.array('images', 4)]),
-      this.patch('/asset', (req, res) => new AssetController(req, res).update()),
+      this.patch('/asset/:id', (req, res) => new AssetController(req, res).update(), [Middleware.auth]),
+      this.patch('/asset/:id/bid', (req, res) => new AssetController(req, res).updateBid(), [Middleware.auth]),
 
       this.get('/payment', (req, res) => new PaymentController(req, res).get()),
       this.post('/payment', (req, res) => new PaymentController(req, res).create()),
@@ -82,8 +84,12 @@ class Route {
     ];
   }
 
-  get(path, handlers) {
-    return this.router.get(path, asyncHandler(handlers));
+  get(path, handlers, middleware) {
+    if (middleware === undefined) {
+      return this.router.get(path, asyncHandler(handlers));
+    }
+
+    return this.router.get(path, middleware, asyncHandler(handlers));
   }
 
   post(path, handlers, middleware) {
@@ -102,8 +108,12 @@ class Route {
     return this.router.patch(path, middleware, asyncHandler(handlers));
   }
 
-  delete(path, handlers) {
-    return this.router.delete(path, asyncHandler(handlers));
+  delete(path, handlers, middleware) {
+    if (middleware === undefined) {
+      return this.router.delete(path, asyncHandler(handlers));
+    }
+
+    return this.router.delete(path, middleware, asyncHandler(handlers));
   }
 }
 

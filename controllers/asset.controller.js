@@ -1,19 +1,41 @@
-const { UniqueConstraintError } = require('sequelize');
 const firebase = require('firebase-admin');
 const fs = require('fs/promises');
-const { Asset } = require('../models');
+const { Asset, Transaction, Category } = require('../models');
+const { AssetCollection, TransactionCollection } = require('../collections');
 const Controller = require('../core/controller');
 const ResponseError = require('../exceptions/response.error');
 
 class AssetController extends Controller {
-  get() {
-    return this.sendResponse({ message: 'success save  data' });
+  async getAll() {
+    const assets = await Asset.findAll();
+    const data = await AssetCollection.toArray(assets);
+
+    return this.sendResponse(data);
   }
 
+  async get() {
+    const { id } = this.req.params;
+    const asset = await Asset.findOne({ where: { id } });
+    const data = await AssetCollection.toDetail(asset);
+
+    return this.sendResponse(data);
+  }
+
+  // *Middleware Auth
   async create() {
-    const { email } = this.res.locals.user;
-    const validate = this.validate(['name', 'categoryId', 'description', 'document', 'basePrice', 'endedAt']);
+    const userId = this.res.locals.user.id;
+    const validate = this.validate(['name', 'categoryId', 'description', 'document', 'location', 'basePrice', 'endedAt']);
     if (validate) {
+      const {
+        name, categoryId, basePrice, endedAt, description, document, location,
+      } = validate;
+
+      // check category
+      const category = await Category.findOne({ where: { id: categoryId } });
+      if (category === null) {
+        throw new ResponseError('Category not found', 404);
+      }
+
       const { files } = this.req;
       // validate file is image
       for (let i = 0; i < files.length; i++) {
@@ -39,93 +61,74 @@ class AssetController extends Controller {
         await fs.unlink(path); // delete temp file
       }
 
-      const {
-        name, categoryId, basePrice, endedAt, description, document,
-      } = validate;
-
       const asset = await Asset.create({
-        email, name, categoryId, images: JSON.stringify(images), basePrice, endedAt, description, document,
+        userId, name, categoryId, images: JSON.stringify(images), basePrice, endedAt, description, document, location,
       });
 
-      return this.sendResponse({
-        email,
-        name: asset.name,
-        categoryId: asset.categoryId,
-        images,
-        basePrice: asset.basePrice,
-        description: asset.description,
-        document: asset.document,
-        isSold: asset.isSold,
-        endedAt: asset.endedAt,
-        createdAt: asset.createdAt,
-        updatedAt: asset.updatedAt,
-      }, 'Success register', 201);
+      const data = await AssetCollection.toJSON(asset);
+      return this.sendResponse(data, 'Success add asset', 201);
     }
 
     return null;
   }
 
+  // *Middleware Auth
   async update() {
     const { id } = this.req.params;
-    const validate = this.validate(['email', 'name', 'categoryId', 'image', 'basePrice', 'isSold', 'endedAt']);
+    const validate = this.validate(['name', 'categoryId', 'description', 'document', 'location', 'endedAt']);
 
     if (validate) {
       const {
-        email, name, categoryId, image, basePrice, isSold, endedAt,
+        name, categoryId, description, location, endedAt,
       } = validate;
 
-      try {
-        await Asset.update({
-          email, name, categoryId, image, basePrice, isSold, endedAt,
-        }, {
-          where: { id },
-        });
-
-        return this.sendResponse({
-          id,
-          email,
-          name,
-          categoryId,
-          image,
-          basePrice,
-          isSold,
-          endedAt,
-        }, 'Success update');
-      } catch (e) {
-        if (e instanceof UniqueConstraintError) {
-          return this.sendResponse(null, 'Email already used', 400);
-        }
-        return this.sendResponse(null, 'Failed', 400);
+      const asset = await Asset.findOne({ where: { id } });
+      if (asset === null) {
+        throw new ResponseError('Asset not found', 404);
       }
+
+      asset.name = name;
+      asset.categoryId = categoryId;
+      asset.description = description;
+      asset.location = location;
+      asset.endedAt = endedAt;
+      asset.save();
+
+      const data = await AssetCollection.toJSON(asset);
+      return this.sendResponse(data, 'Success update asset');
     }
 
     return null;
   }
 
-  async delete() {
+  // *Middleware Auth
+  async updateBid() {
     const { id } = this.req.params;
+    const userId = this.res.locals.user.id;
+    const validate = this.validate(['bid']);
 
-    try {
-      const data = await Asset.findOne({
-        where: { id },
-      });
-
-      if (!data) {
-        return null;
+    if (validate) {
+      const { bid } = validate;
+      const asset = await Asset.findOne({ where: { id } });
+      if (asset === null) {
+        throw new ResponseError('Asset not found', 404);
+      }
+      // check if bid greater then base price
+      if (bid < asset.basePrice) {
+        throw new ResponseError('Bid must be greater then asset base price', 400);
       }
 
-      await Asset.destroy({
-        where: { id },
+      const transaction = await Transaction.create({
+        assetId: id,
+        userId,
+        bidPrice: bid,
       });
 
-      return this.sendResponse({
-        status: 'ok',
-        server_message: 'record deleted',
-      });
-    } catch (err) {
-      console.log(err);
-      return null;
+      const data = await TransactionCollection.toJson(transaction);
+      return this.sendResponse(data, 'Success bid asset', 201);
     }
+
+    return null;
   }
 }
 

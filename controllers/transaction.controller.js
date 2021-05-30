@@ -2,6 +2,7 @@ const { UniqueConstraintError } = require('sequelize');
 const { category, transaction } = require('../models');
 const Controller = require('../core/controller');
 
+// TODO modify this controller
 class TransactionController extends Controller {
   get() {
     return this.sendResponse({ message: 'success save data' });

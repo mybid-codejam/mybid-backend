@@ -2,13 +2,14 @@ const { UniqueConstraintError } = require('sequelize');
 const { cart } = require('../models');
 const Controller = require('../core/controller');
 
+// TODO modify this controller
 class CartController extends Controller {
   get() {
     return this.sendResponse({ message: 'success save data' });
   }
 
   async create() {
-    const validate = this.validate(['id', 'assetId', 'email', 'createdAt', 'endedAt']);
+    const validate = this.validate(['assetId']);
 
     if (validate) {
       const {
