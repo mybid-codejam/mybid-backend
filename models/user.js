@@ -7,7 +7,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 
 class User extends Model { }
 User.init({
-  email: { primaryKey: true, type: DataTypes.STRING },
+  email: { allowNull: false, type: DataTypes.STRING },
   password: { allowNull: false, type: DataTypes.STRING },
   firstName: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
   lastName: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },

@@ -15,12 +15,12 @@ Transaction.init({
       key: 'id',
     },
   },
-  email: {
+  userId: {
     allowNull: false,
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     references: {
       model: 'users',
-      key: 'email',
+      key: 'id',
     },
   },
   bidPrice: { allowNull: false, type: DataTypes.INTEGER, defaultValue: 0 },

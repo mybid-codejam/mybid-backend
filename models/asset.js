@@ -7,12 +7,12 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 
 class Asset extends Model { }
 Asset.init({
-  email: {
+  userId: {
     allowNull: false,
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     references: {
       model: 'users',
-      key: 'email',
+      key: 'id',
     },
   },
   categoryId: {
@@ -26,6 +26,7 @@ Asset.init({
   name: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
   description: { allowNull: false, type: DataTypes.TEXT, defaultValue: '' },
   document: { allowNull: false, type: DataTypes.TEXT, defaultValue: '' },
+  location: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
   images: { allowNull: false, type: DataTypes.TEXT, defaultValue: '[]' },
   basePrice: { allowNull: false, type: DataTypes.INTEGER, defaultValue: 0 },
   isSold: { allowNull: false, type: DataTypes.BOOLEAN, defaultValue: false },
