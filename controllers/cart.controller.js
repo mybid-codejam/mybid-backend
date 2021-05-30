@@ -4,7 +4,7 @@ const Controller = require('../core/controller');
 
 class CartController extends Controller {
   get() {
-    return this.sendResponse({ message: 'success save  data' });
+    return this.sendResponse({ message: 'success save data' });
   }
 
   async create() {
@@ -12,19 +12,19 @@ class CartController extends Controller {
 
     if (validate) {
       const {
-        id, assetId, email, createdAt, endedAt
+        id, assetId, email, createdAt, endedAt,
       } = validate;
 
       try {
         const user = await cart.create({
-          id, assetId, email, createdAt, endedAt
+          id, assetId, email, createdAt, endedAt,
         });
         return this.sendResponse({
           id: cart.id,
           assetId: cart.assetId,
           email: cart.email,
           createdAt: cart.createdAt,
-          endedAt: cart.endedAt
+          endedAt: cart.endedAt,
         }, 'Success register', 201);
       } catch (e) {
         if (e instanceof UniqueConstraintError) {
@@ -38,17 +38,16 @@ class CartController extends Controller {
   }
 
   async update() {
-    const { assetId } = this.req.params;
-    const validate = this.validate(['assetId', 'type', 'email']);
+    const validate = this.validate(['id', 'assetId', 'type', 'email']);
 
     if (validate) {
       const {
-        assetId, type, email
+        id, assetId, type, email,
       } = validate;
 
       try {
         await cart.update({
-          assetId, type, email
+          assetId, type, email,
         }, {
           where: { id },
         });
@@ -56,7 +55,7 @@ class CartController extends Controller {
         return this.sendResponse({
           assetId,
           type,
-          email
+          email,
         }, 'Success update');
       } catch (e) {
         if (e instanceof UniqueConstraintError) {
@@ -68,31 +67,32 @@ class CartController extends Controller {
 
     return null;
   }
-  async delete(){
-  const { id } = req.params;
-  try {
-    const data = await cart.findOne({
-      where : {
-        id: id
+
+  async delete() {
+    const { id } = this.req.params;
+    try {
+      const data = await cart.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!data) {
+        return null;
       }
-    })
-    if(!data){
-      return null
+      await cart.destroy({
+        where: {
+          id,
+        },
+      });
+      return this.sendResponse({
+        status: 'ok',
+        server_message: 'record deleted',
+      });
+    } catch (err) {
+      console.log(err);
+      return null;
     }
-    await cart.destroy({
-      where : {
-        id: id
-      }
-    })
-    return this.sendResponse({
-      status : 'ok',
-      server_message : 'record deleted'
-    })
-  } catch (err) {
-    console.log(err)
-    return null
   }
-}
 }
 
 module.exports = CartController;

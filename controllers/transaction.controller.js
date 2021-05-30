@@ -1,10 +1,10 @@
 const { UniqueConstraintError } = require('sequelize');
-const { transaction } = require('../models');
+const { category, transaction } = require('../models');
 const Controller = require('../core/controller');
 
 class TransactionController extends Controller {
   get() {
-    return this.sendResponse({ message: 'success save  data' });
+    return this.sendResponse({ message: 'success save data' });
   }
 
   async create() {
@@ -12,12 +12,12 @@ class TransactionController extends Controller {
 
     if (validate) {
       const {
-        id, assetId, email, bidPrice, createdAt, endedAt
+        id, assetId, email, bidPrice, createdAt, endedAt,
       } = validate;
 
       try {
         const user = await category.create({
-          id, assetId, email, bidPrice, createdAt, endedAt
+          id, assetId, email, bidPrice, createdAt, endedAt,
         });
         return this.sendResponse({
           id: transaction.id,
@@ -25,7 +25,7 @@ class TransactionController extends Controller {
           email: transaction.email,
           bidPrice: transaction.bidPrice,
           createdAt: transaction.createdAt,
-          endedAt: transaction.endedAt
+          endedAt: transaction.endedAt,
         }, 'Success register', 201);
       } catch (e) {
         if (e instanceof UniqueConstraintError) {
@@ -39,17 +39,16 @@ class TransactionController extends Controller {
   }
 
   async update() {
-    const { assetId } = this.req.params;
     const validate = this.validate(['assetId', 'type', 'email', 'bidPrice']);
 
     if (validate) {
       const {
-        id, assetId, email, bidPrice, createdAt, endedAt
+        id, assetId, email, bidPrice, createdAt, endedAt,
       } = validate;
 
       try {
         await transaction.update({
-          id, assetId, email, bidPrice, createdAt, endedAt
+          id, assetId, email, bidPrice, createdAt, endedAt,
         }, {
           where: { id },
         });
@@ -60,7 +59,7 @@ class TransactionController extends Controller {
           email,
           bidPrice,
           createdAt,
-          endedAt
+          endedAt,
         }, 'Success update');
       } catch (e) {
         if (e instanceof UniqueConstraintError) {
@@ -72,31 +71,32 @@ class TransactionController extends Controller {
 
     return null;
   }
-  async delete(){
-  const { id } = req.params;
-  try {
-    const data = await transaction.findOne({
-      where : {
-        id: id
+
+  async delete() {
+    const { id } = this.req.params;
+    try {
+      const data = await transaction.findOne({
+        where: {
+          id,
+        },
+      });
+      if (!data) {
+        return null;
       }
-    })
-    if(!data){
-      return null
+      await transaction.destroy({
+        where: {
+          id,
+        },
+      });
+      return this.sendResponse({
+        status: 'ok',
+        server_message: 'record deleted',
+      });
+    } catch (err) {
+      console.log(err);
+      return null;
     }
-    await transaction.destroy({
-      where : {
-        id: id
-      }
-    })
-    return this.sendResponse({
-      status : 'ok',
-      server_message : 'record deleted'
-    })
-  } catch (err) {
-    console.log(err)
-    return null
   }
-}
 }
 
 module.exports = TransactionController;
