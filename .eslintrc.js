@@ -11,8 +11,9 @@ module.exports = {
     ecmaVersion: 12,
   },
   rules: {
-    'import/prefer-default-export': 'off',
     'no-plusplus': 'off',
     'max-len': 'off',
+    'no-unused-vars': 'off',
+    'no-await-in-loop': 'off',
   },
 };
