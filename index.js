@@ -1,6 +1,5 @@
 require('dotenv').config(); // register .env
 const express = require('express');
-const bodyParser = require('body-parser');
 const firebase = require('firebase-admin');
 const Route = require('./routes/route');
 const serviceAccount = require('./mybid-e8958-firebase-adminsdk-tke8g-b70beafbeb.json');
@@ -17,7 +16,7 @@ firebase.initializeApp(firebaseConfig);
 
 // *init module
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 
 // *init route
 app.use('/api', new Route().init());
