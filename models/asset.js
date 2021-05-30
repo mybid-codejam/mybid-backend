@@ -29,7 +29,7 @@ Asset.init({
   images: { allowNull: false, type: DataTypes.TEXT, defaultValue: '[]' },
   basePrice: { allowNull: false, type: DataTypes.INTEGER, defaultValue: 0 },
   isSold: { allowNull: false, type: DataTypes.BOOLEAN, defaultValue: false },
-  endedAt: { allowNull: false, type: DataTypes.DATE, defaultValue: new Date().toISOString() },
+  endedAt: { allowNull: false, type: DataTypes.DATE, defaultValue: Sequelize.fn('now') },
 }, {
   sequelize,
   tableName: 'assets',
