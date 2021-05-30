@@ -23,6 +23,7 @@ class AssetController extends Controller {
           throw new ResponseError('Only image', 400);
         }
       }
+
       const storage = firebase.storage();
       const bucket = storage.bucket();
       const images = [];
