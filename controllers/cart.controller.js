@@ -1,14 +1,15 @@
 const { UniqueConstraintError } = require('sequelize');
-const { cart } = require('../models');
+const { Cart } = require('../models');
 const Controller = require('../core/controller');
 
 // TODO modify this controller
 class CartController extends Controller {
   // TODO ambil semua semua item dikeranjang berdasarkan id user
   async getAll() {
-    const { id } = this.res.locals.user; // untuk mengambil data user id yang sedang login
+    const { userId } = this.res.locals.user; // untuk mengambil data user id yang sedang login
 
     // TODO setelah mengambil data, maka tampilan lewat response
+    const carts = await Cart.findAll({ where: { userId } });
     return this.sendResponse({ message: 'success save data' });
   }
 
@@ -17,12 +18,11 @@ class CartController extends Controller {
     const validate = this.validate(['assetId']);
 
     if (validate) {
-      const {
-        id, assetId, email, createdAt, endedAt,
-      } = validate;
+      const { assetId } = validate;
 
-      const user = await cart.create({
-        id, assetId, email, createdAt, endedAt,
+      const { userId } = this.res.locals.user;
+      const cart = await Cart.create({
+        assetId, userId,
       });
 
       // TODO setelah insert data, maka tampilan semua item di keranjang lewat response
@@ -42,7 +42,7 @@ class CartController extends Controller {
   async delete() {
     const { id } = this.req.params;
 
-    const data = await cart.findOne({
+    const data = await Cart.findOne({
       where: {
         id,
       },
@@ -50,7 +50,7 @@ class CartController extends Controller {
     if (!data) {
       return null;
     }
-    await cart.destroy({
+    await Cart.destroy({
       where: {
         id,
       },
