@@ -31,9 +31,12 @@ class Route {
     return [
       this.get('/', (req, res) => new HomeController(req, res).getHome()),
 
+      this.get('/profile', (req, res) => new UserController(req, res).get(), [Middleware.auth]),
       this.post('/register', (req, res) => new UserController(req, res).register()),
       this.post('/login', (req, res) => new UserController(req, res).login()),
-      this.patch('/profile', (req, res) => new UserController(req, res).update(), [Middleware.auth]),
+      this.patch('/profile/photo', (req, res) => new UserController(req, res).updatePhoto(), [Middleware.auth, this.upload.single('photoProfile')]),
+      this.patch('/profile/account', (req, res) => new UserController(req, res).updateAccount(), [Middleware.auth]),
+      this.patch('/profile/info', (req, res) => new UserController(req, res).updateInfo(), [Middleware.auth]),
 
       this.get('/cart', (req, res) => new CartController(req, res).getAll(), [Middleware.auth]),
       this.post('/cart', (req, res) => new CartController(req, res).create(), [Middleware.auth]),

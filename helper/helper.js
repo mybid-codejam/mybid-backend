@@ -1,3 +1,5 @@
+const toCapital = (str) => str[0].toUpperCase() + str.slice(1);
+
 const currencyFormat = (num) => {
   const formatter = Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -16,6 +18,7 @@ const dateTimeFormat = (dateTime) => {
   return formatter.format(dateTime);
 };
 
+exports.toCapital = toCapital;
 exports.currencyFormat = currencyFormat;
 exports.dateFormat = dateFormat;
 exports.dateTimeFormat = dateTimeFormat;
