@@ -1,66 +1,50 @@
-const { UniqueConstraintError } = require('sequelize');
-const { Cart } = require('../models');
+const { Cart, Asset } = require('../models');
 const Controller = require('../core/controller');
+const { CartCollection } = require('../collections');
+const ResponseError = require('../exceptions/response.error');
 
-// TODO modify this controller
 class CartController extends Controller {
-  // TODO ambil semua semua item dikeranjang berdasarkan id user
   async getAll() {
-    const { userId } = this.res.locals.user; // untuk mengambil data user id yang sedang login
+    const { id } = this.res.locals.user;
 
-    // TODO setelah mengambil data, maka tampilan lewat response
-    const carts = await Cart.findAll({ where: { userId } });
-    return this.sendResponse({ message: 'success save data' });
+    const carts = await Cart.findAll({ where: { userId: id } });
+    const data = await CartCollection.toArray(carts);
+
+    return this.sendResponse(data);
   }
 
-  // TODO insert data asset id ke item berdasarkan id user
   async create() {
+    const { id } = this.res.locals.user;
     const validate = this.validate(['assetId']);
 
     if (validate) {
       const { assetId } = validate;
+      const asset = await Asset.findOne({ where: { id: assetId } });
+      if (asset === null) {
+        throw new ResponseError('Asset not found', 404);
+      }
 
-      const { userId } = this.res.locals.user;
       const cart = await Cart.create({
-        assetId, userId,
+        assetId, userId: id,
       });
 
-      // TODO setelah insert data, maka tampilan semua item di keranjang lewat response
-      return this.sendResponse({
-        id: cart.id,
-        assetId: cart.assetId,
-        email: cart.email,
-        createdAt: cart.createdAt,
-        endedAt: cart.endedAt,
-      }, 'Success register', 201);
+      const data = await CartCollection.toJSON(cart);
+      return this.sendResponse(data, 'Success add to cart', 201);
     }
-
     return null;
   }
 
-  // TODO delete data cart id ke item berdasarkan id user
   async delete() {
     const { id } = this.req.params;
+    const userId = this.res.locals.user.id;
 
-    const data = await Cart.findOne({
-      where: {
-        id,
-      },
-    });
-    if (!data) {
-      return null;
+    const cart = await Cart.findOne({ where: { id, userId } });
+    if (cart === null) {
+      throw new ResponseError('Cart not found', 404);
     }
-    await Cart.destroy({
-      where: {
-        id,
-      },
-    });
 
-    // TODO setelah delete data, maka tampilan semua item di keranjang lewat response
-    return this.sendResponse({
-      status: 'ok',
-      server_message: 'record deleted',
-    });
+    await Cart.destroy({ where: { id } });
+    return this.sendResponse('Delete success');
   }
 }
 
