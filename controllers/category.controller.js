@@ -36,7 +36,7 @@ class CategoryController extends Controller {
 
       const category = await Category.findOne({ where: { id } });
       category.name = name;
-      category.save();
+      await category.save();
 
       const data = CategoryCollection.toJson(category);
       return this.sendResponse(data, 'Success update');

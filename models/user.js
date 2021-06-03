@@ -1,3 +1,4 @@
+const md5 = require('md5');
 const { Sequelize, Model, DataTypes } = require('sequelize');
 
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
@@ -8,7 +9,14 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 class User extends Model { }
 User.init({
   email: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
-  password: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
+  password: {
+    allowNull: false,
+    type: DataTypes.STRING,
+    defaultValue: '',
+    set(value) {
+      this.setDataValue('password', md5(value));
+    },
+  },
   fullName: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
   photoProfile: { allowNull: true, type: DataTypes.TEXT },
   phoneNumber: { allowNull: true, type: DataTypes.STRING },
@@ -22,7 +30,13 @@ User.init({
   kelurahan: { allowNull: true, type: DataTypes.STRING },
   kecamatan: { allowNull: true, type: DataTypes.STRING },
   category: { allowNull: false, type: DataTypes.ENUM(['penjual', 'pembeli']), defaultValue: 'pembeli' },
-  apiToken: { allowNull: true, type: DataTypes.STRING },
+  apiToken: {
+    allowNull: true,
+    type: DataTypes.STRING,
+    set(value) {
+      this.setDataValue('password', md5(value));
+    },
+  },
   lastLogin: { allowNull: true, type: DataTypes.DATE },
 }, {
   sequelize,

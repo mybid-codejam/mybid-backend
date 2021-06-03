@@ -1,4 +1,3 @@
-const md5 = require('md5');
 const firebase = require('firebase-admin');
 const fs = require('fs/promises');
 const Controller = require('../core/controller');
@@ -22,7 +21,7 @@ class UserController extends Controller {
       }
 
       const user = await User.create({
-        fullName, email, password: md5(password), category,
+        fullName, email, password, category,
       });
 
       const data = UserCollection.toJson(user);
@@ -36,18 +35,18 @@ class UserController extends Controller {
     const validate = this.validate(['email', 'password']);
     if (validate) {
       const { email, password } = validate;
-      const user = await User.findOne({ where: { email, password: md5(password) } });
+      const user = await User.findOne({ where: { email, password } });
 
       if (user === null) {
         throw new ResponseError('User not found or wrong email/password', 404);
       }
 
       // update api token and last login
-      const apiToken = md5(Date.now());
+      const apiToken = Date.now();
       const lastLogin = new Date().toISOString();
       user.apiToken = apiToken;
       user.lastLogin = lastLogin;
-      user.save();
+      await user.save();
 
       const data = UserCollection.toJson(user);
       return this.sendResponse(data, 'Success login');
@@ -85,7 +84,7 @@ class UserController extends Controller {
 
     const user = await User.findOne({ where: { email } });
     user.photoProfile = imageUrl;
-    user.save();
+    await user.save();
 
     const data = UserCollection.toDetail(user);
     return this.sendResponse(data, 'Success update profile');
@@ -104,7 +103,7 @@ class UserController extends Controller {
       const user = await User.findOne({ where: { email } });
       user.fullName = fullName;
       user.phoneNumber = phoneNumber;
-      user.save();
+      await user.save();
 
       const data = UserCollection.toDetail(user);
       return this.sendResponse(data, 'Success update profile');
@@ -135,7 +134,7 @@ class UserController extends Controller {
       user.rt = rt;
       user.kelurahan = kelurahan;
       user.kecamatan = kecamatan;
-      user.save();
+      await user.save();
 
       const data = UserCollection.toDetail(user);
       return this.sendResponse(data, 'Success update profile');

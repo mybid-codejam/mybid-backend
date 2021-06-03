@@ -26,6 +26,7 @@ Asset.init({
   name: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
   description: { allowNull: false, type: DataTypes.TEXT, defaultValue: '' },
   document: { allowNull: false, type: DataTypes.TEXT, defaultValue: '' },
+  province: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
   location: { allowNull: false, type: DataTypes.STRING, defaultValue: '' },
   images: { allowNull: false, type: DataTypes.TEXT, defaultValue: '[]' },
   basePrice: { allowNull: false, type: DataTypes.INTEGER, defaultValue: 0 },
