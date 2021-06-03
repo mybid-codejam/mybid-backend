@@ -7,12 +7,12 @@ const Transaction = require('./transaction');
 
 // sync models
 (async () => {
-  await User.sync({ alter: false, logging: false });
-  await Category.sync({ alter: false, logging: false });
-  await Asset.sync({ alter: false, logging: false });
-  await Cart.sync({ alter: false, logging: false });
-  await Transaction.sync({ alter: false, logging: false });
-  await Payment.sync({ alter: false, logging: false });
+  await User.sync({ alter: true, logging: false });
+  await Category.sync({ alter: true, logging: false });
+  await Asset.sync({ alter: true, logging: false });
+  await Cart.sync({ alter: true, logging: false });
+  await Transaction.sync({ alter: true, logging: false });
+  await Payment.sync({ alter: true, logging: false });
 })();
 
 exports.User = User;
