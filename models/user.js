@@ -1,3 +1,4 @@
+require('./pgEnum-fix');
 const md5 = require('md5');
 const { Sequelize, Model, DataTypes } = require('sequelize');
 
