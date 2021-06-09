@@ -1,5 +1,6 @@
 const firebase = require('firebase-admin');
 const fs = require('fs/promises');
+const md5 = require('md5');
 const Controller = require('../core/controller');
 const ResponseError = require('../exceptions/response.error');
 const { User } = require('../models');
@@ -35,7 +36,7 @@ class UserController extends Controller {
     const validate = this.validate(['email', 'password']);
     if (validate) {
       const { email, password } = validate;
-      const user = await User.findOne({ where: { email, password } });
+      const user = await User.findOne({ where: { email, password: md5(password) } });
 
       if (user === null) {
         throw new ResponseError('User not found or wrong email/password', 404);
