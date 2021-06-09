@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "start:dev": "nodemon index.js",
+    "migrate": "node migrate.js",
     "lint": "eslint . --fix"
   },
   "author": "",
