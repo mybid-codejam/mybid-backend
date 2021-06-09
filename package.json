@@ -6,6 +6,7 @@
     "start": "node index.js",
     "start:dev": "nodemon index.js",
     "migrate": "node migrate.js",
+    "heroku-postbuild": "npm run migrate",
     "lint": "eslint . --fix"
   },
   "author": "",
