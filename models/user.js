@@ -35,7 +35,7 @@ User.init({
     allowNull: true,
     type: DataTypes.STRING,
     set(value) {
-      this.setDataValue('password', md5(value));
+      this.setDataValue('apiToken', md5(value));
     },
   },
   lastLogin: { allowNull: true, type: DataTypes.DATE },
