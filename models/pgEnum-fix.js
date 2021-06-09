@@ -1,6 +1,7 @@
 const PostgresQueryGenerator = require('sequelize/lib/dialects/postgres/query-generator');
 
-PostgresQueryGenerator.prototype.pgEnum = (tableName, attr, dataType, options) => {
+// eslint-disable-next-line func-names
+PostgresQueryGenerator.prototype.pgEnum = function (tableName, attr, dataType, options) {
   const enumName = this.pgEnumName(tableName, attr, options);
   let values;
 
