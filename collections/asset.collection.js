@@ -9,6 +9,7 @@ class AssetCollection {
       const category = await Category.findOne({ where: { id: assets[i].categoryId } });
       data.push({
         id: assets[i].id,
+        name: assets[i].name,
         isSold: assets[i].isSold,
         location: assets[i].location,
         province: assets[i].province,
