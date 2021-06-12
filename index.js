@@ -1,5 +1,6 @@
 require('dotenv').config(); // register .env
 const express = require('express');
+const cors = require('cors');
 const firebase = require('firebase-admin');
 const Route = require('./routes/route');
 const serviceAccount = require('./mybid-e8958-firebase-adminsdk-tke8g-b70beafbeb.json');
@@ -15,6 +16,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 // *init module
+// cors
+app.use(cors());
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
 
