@@ -14,16 +14,18 @@ class AssetController extends Controller {
     let data = assets.map((val) => val.dataValues);
     const queries = this.req.query;
     Object.entries(queries).forEach(([key, value]) => {
-      if (key === 'category') {
-        data = data.filter((val) => parseInt(val.categoryId, 10) === parseInt(value, 10));
-      } else if (key === 'max') {
-        data = data.filter((val) => parseInt(val.basePrice, 10) <= parseInt(value, 10));
-      } else if (key === 'min') {
-        data = data.filter((val) => parseInt(val.basePrice, 10) >= parseInt(value, 10));
-      } else if (key === 'end') {
-        data = data.filter((val) => dateFormatDash(val.endedAt) === value);
-      } else {
-        data = data.filter((val) => val[key] === value);
+      if (value !== 'null') {
+        if (key === 'category') {
+          data = data.filter((val) => parseInt(val.categoryId, 10) === parseInt(value, 10));
+        } else if (key === 'max') {
+          data = data.filter((val) => parseInt(val.basePrice, 10) <= parseInt(value, 10));
+        } else if (key === 'min') {
+          data = data.filter((val) => parseInt(val.basePrice, 10) >= parseInt(value, 10));
+        } else if (key === 'end') {
+          data = data.filter((val) => dateFormatDash(val.endedAt) === value);
+        } else {
+          data = data.filter((val) => val[key] === value);
+        }
       }
     });
 
