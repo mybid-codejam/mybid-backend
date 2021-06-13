@@ -8,11 +8,11 @@ const { UserCollection } = require('../collections');
 
 class UserController extends Controller {
   async register() {
-    const validate = this.validate(['fullName', 'email', 'password', 'category']);
+    const validate = this.validate(['fullName', 'email', 'password', 'gender', 'category']);
 
     if (validate) {
       const {
-        fullName, email, password, category,
+        fullName, email, password, gender, category,
       } = validate;
 
       // check if email exist or not
@@ -22,7 +22,7 @@ class UserController extends Controller {
       }
 
       const user = await User.create({
-        fullName, email, password, category,
+        fullName, email, password, gender, category,
       });
 
       const data = UserCollection.toJson(user);
