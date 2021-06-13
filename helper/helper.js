@@ -13,6 +13,11 @@ const dateFormat = (date) => {
   return formatter.format(date);
 };
 
+const dateFormatDash = (date) => {
+  const formatter = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return formatter.format(date).replace(/\//g, '-');
+};
+
 const dateTimeFormat = (dateTime) => {
   const formatter = Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short' });
   return formatter.format(dateTime);
@@ -21,4 +26,5 @@ const dateTimeFormat = (dateTime) => {
 exports.toCapital = toCapital;
 exports.currencyFormat = currencyFormat;
 exports.dateFormat = dateFormat;
+exports.dateFormatDash = dateFormatDash;
 exports.dateTimeFormat = dateTimeFormat;

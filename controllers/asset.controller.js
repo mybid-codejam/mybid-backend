@@ -4,6 +4,7 @@ const { Asset, Transaction, Category } = require('../models');
 const { AssetCollection, TransactionCollection } = require('../collections');
 const Controller = require('../core/controller');
 const ResponseError = require('../exceptions/response.error');
+const { dateFormatDash } = require('../helper/helper');
 
 class AssetController extends Controller {
   async getAll() {
@@ -19,6 +20,8 @@ class AssetController extends Controller {
         data = data.filter((val) => parseInt(val.basePrice, 10) <= parseInt(value, 10));
       } else if (key === 'min') {
         data = data.filter((val) => parseInt(val.basePrice, 10) >= parseInt(value, 10));
+      } else if (key === 'end') {
+        data = data.filter((val) => dateFormatDash(val.endedAt) === value);
       } else {
         data = data.filter((val) => val[key] === value);
       }
