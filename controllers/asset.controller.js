@@ -24,7 +24,7 @@ class AssetController extends Controller {
         } else if (key === 'end') {
           data = data.filter((val) => dateFormatDash(val.endedAt) === value);
         } else {
-          data = data.filter((val) => val[key] === value);
+          data = data.filter((val) => val[key].toLowerCase() === value.toLowerCase());
         }
       }
     });
