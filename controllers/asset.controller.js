@@ -8,13 +8,13 @@ const { dateFormatDash } = require('../helper/helper');
 
 class AssetController extends Controller {
   async getAll() {
-    // query [categoryId, location, province, min, max]
+    // query [categoryId, location, province, min, max, end]
     const assets = await Asset.findAll();
 
     let data = assets.map((val) => val.dataValues);
     const queries = this.req.query;
     Object.entries(queries).forEach(([key, value]) => {
-      if (value !== 'null') {
+      if (value !== 'null' && value !== '') {
         if (key === 'category') {
           data = data.filter((val) => parseInt(val.categoryId, 10) === parseInt(value, 10));
         } else if (key === 'max') {
