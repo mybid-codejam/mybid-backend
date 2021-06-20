@@ -9,7 +9,11 @@ const app = express();
 
 // *init firebase
 const firebaseConfig = {
-  credential: firebase.credential.cert(`./${process.env.FIREBASE_PATH}`),
+  credential: firebase.credential.cert({
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+  }),
   storageBucket: process.env.FIREBASE_BUCKET,
 };
 firebase.initializeApp(firebaseConfig);
