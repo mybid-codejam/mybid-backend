@@ -3,15 +3,14 @@ const express = require('express');
 const cors = require('cors');
 const firebase = require('firebase-admin');
 const Route = require('./routes/route');
-const serviceAccount = require('./mybid-e8958-firebase-adminsdk-tke8g-b70beafbeb.json');
 
 const port = process.env.PORT || 3000;
 const app = express();
 
 // *init firebase
 const firebaseConfig = {
-  credential: firebase.credential.cert(serviceAccount),
-  storageBucket: 'mybid-e8958.appspot.com',
+  credential: firebase.credential.cert(`./${process.env.FIREBASE_PATH}`),
+  storageBucket: process.env.FIREBASE_BUCKET,
 };
 firebase.initializeApp(firebaseConfig);
 
